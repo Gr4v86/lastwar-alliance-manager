@@ -87,7 +87,7 @@ func getPermissionsSchema(w http.ResponseWriter, r *http.Request) {
 // Admin: Get all users with login information (DEADLOCK FIXED)
 func getAdminUsers(w http.ResponseWriter, r *http.Request) {
 	query := `
-		SELECT u.id, u.username, u.member_id, u.is_admin, u.is_active, u.force_password_change,
+		SELECT u.id, u.username, u.member_id, u.is_admin, u.full_access, u.is_active, u.force_password_change,
 		   m.name as member_name,
 		   (SELECT login_time FROM login_sessions WHERE user_id = u.id AND success = 1 ORDER BY login_time DESC LIMIT 1) as last_login,
 		   (SELECT COUNT(*) FROM login_sessions WHERE user_id = u.id AND success = 1) as login_count
@@ -111,7 +111,7 @@ func getAdminUsers(w http.ResponseWriter, r *http.Request) {
 		var memberName sql.NullString
 		var lastLogin sql.NullString
 
-		err := rows.Scan(&user.ID, &user.Username, &memberID, &user.IsAdmin, &user.IsActive, &user.ForcePasswordChange,
+		err := rows.Scan(&user.ID, &user.Username, &memberID, &user.IsAdmin, &user.FullAccess, &user.IsActive, &user.ForcePasswordChange,
 			&memberName, &lastLogin, &user.LoginCount)
 		if err != nil {
 			continue
@@ -211,8 +211,8 @@ func createAdminUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := db.Exec("INSERT INTO users (username, password, member_id, is_admin, force_password_change) VALUES (?, ?, ?, ?, ?)",
-		req.Username, string(hashedPassword), req.MemberID, req.IsAdmin, req.ForcePasswordChange)
+	result, err := db.Exec("INSERT INTO users (username, password, member_id, is_admin, full_access, force_password_change) VALUES (?, ?, ?, ?, ?, ?)",
+		req.Username, string(hashedPassword), req.MemberID, req.IsAdmin, req.FullAccess, req.ForcePasswordChange)
 	if err != nil {
 		slog.Error("failed to create user", "error", err)
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
@@ -300,11 +300,11 @@ func updateAdminUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Username != "" {
-		_, err = tx.Exec("UPDATE users SET username = ?, member_id = ?, is_admin = ?, force_password_change = ? WHERE id = ?",
-			req.Username, req.MemberID, req.IsAdmin, req.ForcePasswordChange, userID)
+		_, err = tx.Exec("UPDATE users SET username = ?, member_id = ?, is_admin = ?, full_access = ?, force_password_change = ? WHERE id = ?",
+			req.Username, req.MemberID, req.IsAdmin, req.FullAccess, req.ForcePasswordChange, userID)
 	} else {
-		_, err = tx.Exec("UPDATE users SET member_id = ?, is_admin = ?, force_password_change = ? WHERE id = ?",
-			req.MemberID, req.IsAdmin, req.ForcePasswordChange, userID)
+		_, err = tx.Exec("UPDATE users SET member_id = ?, is_admin = ?, full_access = ?, force_password_change = ? WHERE id = ?",
+			req.MemberID, req.IsAdmin, req.FullAccess, req.ForcePasswordChange, userID)
 	}
 
 	if err != nil {

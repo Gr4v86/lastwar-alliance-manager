@@ -57,6 +57,9 @@ func getPageData(r *http.Request, title, activePage string) PageData {
 			if user.IsAdmin {
 				data.IsAdmin = true
 				data.Permissions = allPermissionsTrue()
+			} else if user.FullAccess {
+				// Full Access grants all alliance features, but not admin access.
+				data.Permissions = allPermissionsTrue()
 			} else if user.Rank != "" {
 				data.Permissions = getRankPermissions(user.Rank)
 			}

@@ -1,6 +1,9 @@
 services:
   alliance-manager:
-    image: ghcr.io/shodiwarmic/lastwar-alliance-manager:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lastwar-alliance-manager:local
     container_name: alliance-manager
     restart: unless-stopped
     # Allow graceful shutdown (25s server drain + up to 10s archive drain) to

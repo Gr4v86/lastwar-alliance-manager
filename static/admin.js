@@ -318,6 +318,7 @@ function showCreateUserModal() {
 
     // Default to true for new users
     document.getElementById('force-password-change').checked = true;
+    document.getElementById('full-access').checked = false;
 
     document.getElementById('password-group').style.display = 'block';
     document.getElementById('password').required = true;
@@ -337,6 +338,7 @@ function editUser(userId) {
     document.getElementById('username').value = user.username;
     memberIdChoices.setChoiceByValue(user.member_id ? String(user.member_id) : '');
     document.getElementById('is-admin').checked = user.is_admin;
+    document.getElementById('full-access').checked = user.full_access;
 
     // Check the box if the user is currently flagged in the DB
     document.getElementById('force-password-change').checked = user.force_password_change;
@@ -365,12 +367,14 @@ async function saveUser(event) {
     const password = document.getElementById('password').value;
     const memberIdValue = document.getElementById('member-id').value;
     const isAdmin = document.getElementById('is-admin').checked;
+    const fullAccess = document.getElementById('full-access').checked;
     const forcePasswordChange = document.getElementById('force-password-change').checked;
 
     const userData = {
         username,
         member_id: memberIdValue ? parseInt(memberIdValue) : null,
         is_admin: isAdmin,
+        full_access: fullAccess,
         force_password_change: forcePasswordChange
     };
 

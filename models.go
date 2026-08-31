@@ -277,6 +277,7 @@ type AdminUserRequest struct {
 	Password            string `json:"password,omitempty"`
 	MemberID            *int   `json:"member_id,omitempty"`
 	IsAdmin             bool   `json:"is_admin"`
+	FullAccess          bool   `json:"full_access"`
 	ForcePasswordChange bool   `json:"force_password_change"`
 }
 
@@ -286,6 +287,7 @@ type AdminUserResponse struct {
 	MemberID            *int           `json:"member_id,omitempty"`
 	MemberName          *string        `json:"member_name,omitempty"`
 	IsAdmin             bool           `json:"is_admin"`
+	FullAccess          bool           `json:"full_access"`
 	IsActive            bool           `json:"is_active"`
 	CreatedAt           string         `json:"created_at,omitempty"`
 	LastLogin           *string        `json:"last_login,omitempty"`
@@ -757,11 +759,11 @@ type AllianceReportPlayer struct {
 // and the UI can offer to add it. IsOwn means the caller reported on our own alliance,
 // which by Rule 2 has no registry row at all — its stats land in the is_own history series.
 type AllianceReportRegistry struct {
-	InRegistry         bool  `json:"in_registry"`
-	IsOwn              bool  `json:"is_own"`
-	ExternalAllianceID *int  `json:"external_alliance_id"`
-	StatsApplied       bool  `json:"stats_applied"`
-	HistoryAdded       bool  `json:"history_added"`
+	InRegistry         bool `json:"in_registry"`
+	IsOwn              bool `json:"is_own"`
+	ExternalAllianceID *int `json:"external_alliance_id"`
+	StatsApplied       bool `json:"stats_applied"`
+	HistoryAdded       bool `json:"history_added"`
 }
 
 // AllianceReport is the basic-report response: one upstream request's worth of data.

@@ -16,11 +16,12 @@ const authUserKey contextKey = "auth_user"
 // AuthUser holds live DB-sourced identity for the current request.
 // It is populated by authMiddleware and accessed via getAuthUser.
 type AuthUser struct {
-	ID       int
-	Username string
-	IsAdmin  bool
-	MemberID *int
-	Rank     string
+	ID         int
+	Username   string
+	IsAdmin    bool
+	FullAccess bool
+	MemberID   *int
+	Rank       string
 }
 
 // getAuthUser returns the AuthUser injected by authMiddleware, or nil.
@@ -41,8 +42,8 @@ func loadUserFromDB(userID int) *AuthUser {
 	var memberID sql.NullInt64
 	var isActive bool
 	err := db.QueryRow(
-		"SELECT username, is_admin, member_id, is_active FROM users WHERE id = ?", userID,
-	).Scan(&user.Username, &user.IsAdmin, &memberID, &isActive)
+		"SELECT username, is_admin, full_access, member_id, is_active FROM users WHERE id = ?", userID,
+	).Scan(&user.Username, &user.IsAdmin, &user.FullAccess, &memberID, &isActive)
 	if err != nil || !isActive {
 		return nil
 	}
@@ -134,7 +135,7 @@ func userHasPermission(user *AuthUser, permKey string) bool {
 	if user == nil {
 		return false
 	}
-	if user.IsAdmin {
+	if user.IsAdmin || user.FullAccess {
 		return true
 	}
 	if user.MemberID != nil && user.Rank != "" {
